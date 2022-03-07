@@ -14,24 +14,35 @@ function setup()
 function draw()
 {
     image(video, 0, 0, 480, 380);
-    // if(rank != "")
-    // {
-    //     for(i = 0; i < objects.length; i++)
-    //     {
-    //         r = random(255);
-    //         g = random(255);
-    //         b = random(255);
-    //         objectDetector.detect(video, gotResult);
-    //         document.getElementById("status").innerHTML = "Status: Objects have been DETECTED!";
-    //         document.getElementById("number_of_objects").innerHTML = "Number of objects detected are: " + objects.length;
-    //         fill(r, g, b);
-    //         percent = floor(objects[i].confidence * 100);
-    //         text(objects[i].label + " " + percent + "%", objects[i].x + 15, objects[i].y + 15);
-    //         noFill();
-    //         stroke(r, g, b);
-    //         rect(objects[i].x, objects[i].y, objects[i].width, objects[i].height);
-    //     }
-    // }
+    if(rank != "")
+    {
+        objectDetector.detect(video, gotResult);
+        for(i = 0; i < objects.length; i++)
+        {
+            document.getElementById("status").innerHTML = "Status: Objects Detected";
+            document.getElementById("number_of_objects").innerHTML = "Number of objects detected are: " + objects.length;
+
+            fill("#FF0000");
+            percent = floor(objects[i].confidence * 100);
+            text(objects[i].label + " " + percent + "%", objects[i].x + 15, objects[i].y);
+            noFill();
+            stroke("#FF0000");
+            rect(objects[i].x, objects[i].y, objects[i].width, objects[i].height);
+            if(objects[i].label == words)
+            {
+                video.stop();
+                objectDetector.detect(gotResult);
+                document.getElementById("status").innerHTML = "The " + words + " has been found!";
+                var synth = window.speechSynthesis;
+                var utterThis = new SpeechSynthesisUtterance("The " + words + "has been found!");
+                synth.speak(utterThis);
+            }
+            else
+            {
+              document.getElementById("status").innerHTML = words + "The " + words + " hasn't been found yet. Please wait...";
+            }
+        }
+    }
 }
 
 function start()
@@ -39,6 +50,7 @@ function start()
     objectDetector = ml5.objectDetector("cocossd", modelLoaded);
     document.getElementById("status").innerHTML = "Status: Detecting Objects";
     words = document.getElementById("text-input").value;
+    
 }
 
 function modelLoaded()
